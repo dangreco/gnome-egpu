@@ -1,3 +1,6 @@
+![Crates.io](https://img.shields.io/crates/v/gnome-egpu)
+![Crates.io](https://img.shields.io/crates/l/gnome-egpu)
+
 # gnome-egpu
 
 ### Tool to switch between iGPU and eGPU on Gnome Wayland
