@@ -5,6 +5,10 @@
 
 ### Tool to switch between iGPU and eGPU on Gnome Wayland
 
+## Dependencies:
+
+- ```libgudev-1.0```
+- ```libglib2.0```
 
 ## Installation:
 
