@@ -1,5 +1,7 @@
 use std::env;
 use std::process;
+use std::io::{BufReader, BufRead};
+use std::os::unix::process::ExitStatusExt;
 
 use glib::GString;
 
@@ -41,9 +43,9 @@ fn setup()
         .wait_for_newline(true)
         .interact()
         .unwrap();
-    
+
     if proceed {
-        
+
         println!("Setting udev rules...");
 
         if IO::set_udev_rules(&gpus.get(selection).unwrap()).is_ok() {
@@ -91,9 +93,55 @@ fn cleanup()
     IO::cleanup();
 }
 
+fn list_blacklisted()
+{
+    let modprobe_result = process::Command::new("/usr/sbin/modprobe")
+        .args(&["--showconfig"])
+        .output();
+    if modprobe_result.is_err() {
+        println!("Warn: /usr/sbin/modprobe failed");
+        println!("{}", modprobe_result.unwrap_err());
+        return
+    }
+    let modprobe = modprobe_result.unwrap();
+    if modprobe.status != std::process::ExitStatus::from_raw(0) {
+        println!("Warn: /usr/sbin/modprobe failed");
+        println!("{}", std::str::from_utf8(modprobe.stderr.as_slice()).unwrap());
+        return
+    }
+
+    let reader = BufReader::new(modprobe.stdout.as_slice());
+    for line in reader.lines() {
+        let ln = line.unwrap();
+        let lnr : &str = ln.as_ref();
+        if lnr.starts_with("blacklist ") {
+            let module = lnr.strip_prefix("blacklist ").unwrap();
+            if module == "radeon" || module == "amdgpu" ||
+                module.contains("nvidia") || module == "nouveau"
+            {
+                println!("Warn: GPU module `{}' is blacklisted", module)
+            }
+        }
+    }
+}
+
+fn list()
+{
+    list_blacklisted();
+    for gpu in GPU::get_gpus() {
+        println!("name={}, device={}", gpu.name, gpu.device);
+    }
+}
+
 fn help()
 {
-    println!("Available commands:\n\n  setup  -  Set up gnome-egpu.\n  pup  -  \"(P)lug/(U)n(P)lug\": run before plugging in/unplugging eGPU.\n  cleanup  -  Remove all files created by gnome-egpu.\n");
+    println!(r#"Available commands:
+
+  setup  -  Set up gnome-egpu.
+  pup  -  "(P)lug/(U)n(P)lug": run before plugging in/unplugging eGPU.
+  cleanup  -  Remove all files created by gnome-egpu.
+  list - print available GPUs, warn about blacklisted modules
+"#);
 }
 
 fn print_error()
@@ -104,7 +152,7 @@ fn print_error()
 }
 
 fn main() {
-   
+
     let args: Vec<String> = env::args().collect();
 
     if args.len() < 2 {
@@ -116,7 +164,8 @@ fn main() {
         "setup" => setup(),
         "pup" => pup(),
         "cleanup" => cleanup(),
-        
+        "list" => list(),
+
         _ => help()
 
     }
