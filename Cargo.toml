@@ -3,6 +3,8 @@ name = "gnome-egpu"
 version = "0.1.0"
 authors = ["dan.greco@live.com"]
 edition = "2018"
+description = "udev rules for eGPU on Gnome"
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
