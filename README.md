@@ -1,9 +1,12 @@
 # !! IMPORTANT !!
 
-## This package is deprecated. Please use [hertg/egpu-switcher](https://github.com/hertg/egpu-switcher) instead!
+## This package is deprecated. Please use an alternative instead!
 
 I didn't have enough time to dedicate to this project unfortunately. 
-However, there's a much better alternative with more features available at [hertg/egpu-switcher](https://github.com/hertg/egpu-switcher).
+However, there's much better alternatives with more features available at:
+
+- [hertg/egpu-switcher](https://github.com/hertg/egpu-switcher) (X.Org)
+- [ewagner12/all-ways-egpu](https://github.com/ewagner12/all-ways-egpu) (Wayland)
 
 Thanks for your understanding!
 
